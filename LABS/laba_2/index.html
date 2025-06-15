@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Парсинг XML: Университет</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Парсинг XML: Университет</h1>
+        <div class="search-box">
+            <label for="facultyName">Поиск по факультетам:</label>
+            <input type="text" id="facultyName" placeholder="Например, Факультет информатики">
+            <button onclick="parseXML()">Показать информацию</button>
+        </div>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        function normalizeString(str) {
+            return str.slice(0, -2).toLowerCase();
+        }
+
+        function parseXML() {
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'data.xml', false);
+            xhr.send();
+
+            if (xhr.status != 200) {
+                alert('Ошибка: ' + xhr.status + ': ' + xhr.statusText);
+                return;
+            }
+
+            var xmlDoc = xhr.responseXML;
+            var faculties = xmlDoc.getElementsByTagName('faculty');
+
+            var facultyName = document.getElementById('facultyName').value.trim();
+            if (!facultyName) {
+                alert('Введите название факультета');
+                return;
+            }
+
+            var output = document.getElementById('output');
+            output.innerHTML = '';
+
+            var facultyFound = false;
+
+            var normalizedFacultyName = normalizeString(facultyName);
+
+            for (var i = 0; i < faculties.length; i++) {
+                var faculty = faculties[i];
+                var currentFacultyName = faculty.getElementsByTagName('name')[0].textContent;
+
+                var normalizedCurrentFacultyName = normalizeString(currentFacultyName);
+
+                if (normalizedCurrentFacultyName.includes(normalizedFacultyName)) {
+                    facultyFound = true;
+
+                    var departments = faculty.getElementsByTagName('department');
+
+                    output.innerHTML += `<div class="faculty"><h2>${currentFacultyName}</h2>`;
+
+                    for (var j = 0; j < departments.length; j++) {
+                        var department = departments[j];
+                        var departmentName = department.getElementsByTagName('name')[0].textContent;
+                        var departmentHead = department.getElementsByTagName('head')[0].textContent;
+                        var courses = department.getElementsByTagName('course');
+
+                        output.innerHTML += `
+                            <div class="department">
+                                <h3>${departmentName}</h3>
+                                <p><strong>Заведующий:</strong> ${departmentHead}</p>
+                        `;
+
+                        for (var k = 0; k < courses.length; k++) {
+                            var course = courses[k];
+                            var title = course.getElementsByTagName('title')[0].textContent;
+                            var credits = course.getElementsByTagName('credits')[0].textContent;
+                            var lecturer = course.getElementsByTagName('lecturer')[0].textContent;
+
+                            output.innerHTML += `
+                                <div class="course">
+                                    <p><strong>Название курса:</strong> ${title}</p>
+                                    <p><strong>Курс:</strong> ${credits}</p>
+                                    <p><strong>Преподаватель:</strong> ${lecturer}</p>
+                                </div>
+                            `;
+                        }
+
+                        output.innerHTML += `</div>`;
+                    }
+
+                    output.innerHTML += `</div>`;
+                }
+            }
+
+            if (!facultyFound) {
+                output.innerHTML = `<p class="error">Факультет с названием "${facultyName}" не найден.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
