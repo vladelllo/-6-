@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список друзей ВКонтакте</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Список друзей ВКонтакте</h1>
+        <button id="loadFriends">Загрузить список друзей</button>
+        <div id="output"></div>
+    </div>
+
+    <script>
+        const accessToken = 'vk1.a.gwkaMXOEfF-bUxhSdx26kRcWVJoQIjNa5rg3YGPA_0-sMXMkgbMEyeJNiLMVAjo-nIoGd_zlzARP9uGil6EnFeXgm9iMFV8ak27jup_hfov29mmBozG611CgjIST-y7D9d1fVeUxM7CsvRP6DbKyHRxAIxxfqBlcqZbmNt-nolGSq1Myy470wW27FWsa_BSV';
+        const apiVersion = '5.131';
+        const userID = '340553765';
+
+        let friendsData = [];
+
+        function loadFriends() {
+            $.getJSON({
+                url: `https://api.vk.com/method/friends.get?access_token=${accessToken}&v=${apiVersion}&fields=first_name,last_name,city,bdate&user_id=${userID}`,
+                jsonp: "callback",
+                dataType: "jsonp"
+            }).done(function(response) {
+                if (response.response) {
+                    friendsData = response.response.items;
+                    displayFriends(friendsData);
+                } else {
+                    $('#output').html('<p class="error">Ошибка при загрузке данных.</p>');
+                }
+            }).fail(function() {
+                $('#output').html('<p class="error">Ошибка при выполнении запроса.</p>');
+            });
+        }
+
+        function displayFriends(friends) {
+            let html = '<table>';
+            html += `
+                <tr>
+                    <th>ID</th>
+                    <th>Имя</th>
+                    <th>
+                        <div class="sort-buttons">
+                            <button class="sort-button" id="sortLastNameAsc"><i class="fas fa-sort-up"></i></button>
+                            <button class="sort-button" id="sortLastNameDesc"><i class="fas fa-sort-down"></i></button>
+                        </div>
+                        Фамилия
+                    </th>
+                    <th>Город</th>
+                    <th>Дата рождения</th>
+                    <th>Возраст (дни)</th>
+                </tr>
+            `;
+            friends.forEach(friend => {
+                const city = friend.city ? friend.city.title : 'Не указан';
+                const bdate = friend.bdate ? friend.bdate : 'Не указана';
+                const ageInDays = calculateAgeInDays(friend.bdate);
+                html += `
+                    <tr>
+                        <td>${friend.id}</td>
+                        <td>${friend.first_name}</td>
+                        <td>${friend.last_name}</td>
+                        <td>${city}</td>
+                        <td>${bdate}</td>
+                        <td>${ageInDays}</td>
+                    </tr>
+                `;
+            });
+            html += '</table>';
+            $('#output').html(html);
+
+            $('#sortLastNameAsc').click(() => sortFriends('asc'));
+            $('#sortLastNameDesc').click(() => sortFriends('desc'));
+        }
+
+        function sortFriends(order) {
+            const sortedFriends = friendsData.slice().sort((a, b) => {
+                if (order === 'asc') {
+                    return a.last_name.localeCompare(b.last_name);
+                } else {
+                    return b.last_name.localeCompare(a.last_name);
+                }
+            });
+            displayFriends(sortedFriends);
+        }
+
+        function calculateAgeInDays(bdate) {
+            if (!bdate || bdate.split('.').length < 3) return 'Неизвестно';
+
+            const [day, month, year] = bdate.split('.').map(Number);
+            const birthDate = new Date(year, month - 1, day);
+            const today = new Date();
+            const diffTime = today - birthDate;
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+            return diffDays;
+        }
+
+        $(document).ready(function() {
+            $('#loadFriends').click(loadFriends);
+        });
+    </script>
+</body>
+</html>

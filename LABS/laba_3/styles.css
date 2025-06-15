@@ -1,0 +1,101 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #e6f0ff;
+    color: #2c3e50;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #1a2a4f;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #1a2a4f;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+button:hover {
+    background-color: #0d1a33;
+}
+
+#output {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table, th, td {
+    border: 1px solid #a8c6ff;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #1a2a4f;
+    color: #ffffff;
+    position: relative;
+    padding-left: 50px;
+}
+
+th .sort-buttons {
+    position: absolute;
+    left: 10px;
+    top: 65%;
+    transform: translateY(-50%);
+    display: flexbox;
+    flex-direction: column;
+    gap: 5px;
+}
+
+th .sort-button {
+    background: none;
+    border: none;
+    color: #ffffff;
+    cursor: pointer;
+    padding: 0px;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+th .sort-button:hover {
+    color: #a8c6ff;
+}
+
+.error {
+    color: #e74c3c;
+    text-align: center;
+    font-size: 16px;
+}
+
+th:nth-child(4), td:nth-child(4), 
+th:nth-child(5), td:nth-child(5),
+th:nth-child(6), td:nth-child(6) { 
+    padding-left: 5px; 
+    padding-right: 5px; 
+    text-align: center;
+}
