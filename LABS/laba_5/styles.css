@@ -1,0 +1,63 @@
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.loading {
+    padding: 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+.progress {
+    height: 20px;
+    background: #4CAF50;
+    color: white;
+    text-align: center;
+    line-height: 20px;
+    border-radius: 3px;
+    transition: width 0.3s;
+    margin-top: 10px;
+}
+
+.friends-list {
+    list-style: none;
+    padding: 0;
+}
+
+.friends-list li {
+    padding: 10px;
+    margin: 5px 0;
+    background: #f9f9f9;
+    border-left: 3px solid #4CAF50;
+}
+
+.error {
+    color: #f44336;
+    padding: 10px;
+}
+
+.warning {
+    color: #FF9800;
+}
+
+button {
+    padding: 8px 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #45a049;
+}
+
+input {
+    padding: 8px;
+    margin: 0 10px;
+    width: 60px;
+}
