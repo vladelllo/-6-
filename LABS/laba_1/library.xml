@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="styles.css"?>
+
+<university>
+    <faculty>
+        <name>Факультет информатики</name>
+        <department>
+            <name>Кафедра программирования</name>
+            <head>Иван Иванов</head>
+            <courses>
+                <course>
+                    <title>Введение в программирование</title>
+                    <credits>1 курс</credits>
+                    <lecturer>Алексей Петров</lecturer>
+                </course>
+                <course>
+                    <title>Алгоритмы и структуры данных</title>
+                    <credits>1 курс</credits>
+                    <lecturer>Мария Сидорова</lecturer>
+                </course>
+            </courses>
+        </department>
+        <department>
+            <name>Кафедра искусственного интеллекта</name>
+            <head>Ольга Кузнецова</head>
+            <courses>
+                <course>
+                    <title>Машинное обучение</title>
+                    <credits>2 курс</credits>
+                    <lecturer>Дмитрий Смирнов</lecturer>
+                </course>
+                <course>
+                    <title>Нейронные сети</title>
+                    <credits>3 курс</credits>
+                    <lecturer>Елена Иванова</lecturer>
+                </course>
+            </courses>
+        </department>
+    </faculty>
+    <faculty>
+        <name>Факультет математики</name>
+        <department>
+            <name>Кафедра алгебры</name>
+            <head>Сергей Васильев</head>
+            <courses>
+                <course>
+                    <title>Линейная алгебра</title>
+                    <credits>1 курс</credits>
+                    <lecturer>Анна Михайлова</lecturer>
+                </course>
+                <course>
+                    <title>Теория чисел</title>
+                    <credits>5 курс</credits>
+                    <lecturer>Павел Николаев</lecturer>
+                </course>
+            </courses>
+        </department>
+        <department>
+            <name>Кафедра геометрии</name>
+            <head>Александр Белов</head>
+            <courses>
+                <course>
+                    <title>Дифференциальная геометрия</title>
+                    <credits>2 курс</credits>
+                    <lecturer>Татьяна Федорова</lecturer>
+                </course>
+                <course>
+                    <title>Топология</title>
+                    <credits>4 курс</credits>
+                    <lecturer>Виктор Соколов</lecturer>
+                </course>
+            </courses>
+        </department>
+    </faculty>
+    <faculty>
+        <name>Факультет физики</name>
+        <department>
+            <name>Кафедра теоретической физики</name>
+            <head>Николай Павлов</head>
+            <courses>
+                <course>
+                    <title>Квантовая механика</title>
+                    <credits>3 курс</credits>
+                    <lecturer>Екатерина Волкова</lecturer>
+                </course>
+                <course>
+                    <title>Теория относительности</title>
+                    <credits>3 курс</credits>
+                    <lecturer>Андрей Морозов</lecturer>
+                </course>
+            </courses>
+        </department>
+        <department>
+            <name>Кафедра экспериментальной физики</name>
+            <head>Дмитрий Козлов</head>
+            <courses>
+                <course>
+                    <title>Физика твердого тела</title>
+                    <credits>2 курс</credits>
+                    <lecturer>Ольга Семенова</lecturer>
+                </course>
+                <course>
+                    <title>Ядерная физика</title>
+                    <credits>4 курс</credits>
+                    <lecturer>Игорь Петров</lecturer>
+                </course>
+            </courses>
+        </department>
+    </faculty>
+</university>
