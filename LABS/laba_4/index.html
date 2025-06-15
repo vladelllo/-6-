@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ЛР №4</title>
+     <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+</head>
+
+<body>
+    <script>
+        get_token = 'https://oauth.vk.com/authorize?client_id=53143641&redirect_uri=https://oauth.vk.com/blank.html&response_type=token&scope=status,offline&v=5.131'
+        
+        $(document).ready(function() {
+            $("#load").click(function() {
+                let text = encodeURIComponent($("#set-status").val());
+                let token = 'vk1.a.gwkaMXOEfF-bUxhSdx26kRcWVJoQIjNa5rg3YGPA_0-sMXMkgbMEyeJNiLMVAjo-nIoGd_zlzARP9uGil6EnFeXgm9iMFV8ak27jup_hfov29mmBozG611CgjIST-y7D9d1fVeUxM7CsvRP6DbKyHRxAIxxfqBlcqZbmNt-nolGSq1Myy470wW27FWsa_BSV';
+                
+                $.ajax({
+                    url: `https://api.vk.com/method/status.set?text=${text}&access_token=${token}&v=5.131`,
+                    dataType: 'jsonp',
+                    success: function(response) {
+                        if (response.response) {
+                            alert("Статус успешно изменен!");
+                        } else if (response.error) {
+                            alert("Ошибка: " + response.error.error_msg);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Произошла ошибка при запросе: " + status);
+                    }
+                });
+            });
+        });
+    </script>
+    <div>
+        <input type="text" id="set-status">
+        <button id="load">Load</button>
+    </div>
+</body>
+</html>
