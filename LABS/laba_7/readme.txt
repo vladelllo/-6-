@@ -1,0 +1,339 @@
+Задание
+Создать бота для Telegram. Отослать ему сообщение со своего аккаунта. С помощью API прочитать это сообщение. Создать HTML файл, который с помощью JavaScript по API прочитает это сообщение и выведет его на странице.
+
+Дополнительное задание
+Получить фотографию аккаунта пользователя, который отправил последнее сообщение бот
+
+Реализация
+Прежде чем начинать разработку, зарегистрируем бота, получив его уникальный id, являющийся одновременно и токеном. Для этого в Telegram существует специальный бот —@BotFather.
+Далее напишем вложенный скрипт JS внутри документа html, который будет, используя методы Telegram API читать отправленное ему сообщение определенного пользователя и выводить это сообщение вместе с ником пользователя на странице. Также реализуем вывод фотографии аккаунта пользователя, который отправил последнее сообщение бот.
+
+Код HTML файла
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Просмотр сообщений Telegram бота</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .token-input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn-blue {
+            background-color: #2196F3;
+        }
+        .btn-blue:hover {
+            background-color: #0b7dda;
+        }
+        .btn-red {
+            background-color: #f44336;
+        }
+        .btn-red:hover {
+            background-color: #d32f2f;
+        }
+        .message-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .message-text {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .message-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: block;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: #666;
+            text-align: right;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        .error {
+            color: #f44336;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
+        }
+        .caption {
+            font-size: 0.9em;
+            color: #555;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Просмотр сообщений Telegram бота</h1>
+    
+    <div class="input-group">
+        <label for="botToken">Токен бота:</label>
+        <input type="text" id="botToken" class="token-input" placeholder="Введите токен бота (например: 7989595985:AAHhbo2Uww5ZGna8H0dDmOYR4n8QFu-7yoQ)">
+    </div>
+    
+    <div>
+        <button id="getMessages" class="btn">Получить сообщения</button>
+        <button id="clearMessages" class="btn btn-red">Очистить</button>
+    </div>
+    
+    <div id="messagesContainer"></div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const getMessagesBtn = document.getElementById('getMessages');
+            const clearMessagesBtn = document.getElementById('clearMessages');
+            const botTokenInput = document.getElementById('botToken');
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            const savedToken = localStorage.getItem('telegramBotToken');
+            if (savedToken) {
+                botTokenInput.value = savedToken;
+            }
+            
+            getMessagesBtn.addEventListener('click', async function() {
+                const botToken = botTokenInput.value.trim();
+                if (!botToken) {
+                    showError('Пожалуйста, введите токен бота');
+                    return;
+                }
+                
+                localStorage.setItem('telegramBotToken', botToken);
+                
+                messagesContainer.innerHTML = '<div class="loading">Загрузка сообщений...</div>';
+                
+                try {
+                    const updates = await getAllUpdates(botToken);
+                    
+                    if (updates.length === 0) {
+                        messagesContainer.innerHTML = '<div class="message-container">Сообщений не найдено. Отправьте сообщение вашему боту.</div>';
+                        return;
+                    }
+                    
+                    messagesContainer.innerHTML = '';
+                    
+                    const usersMessages = groupMessagesByUser(updates);
+                    
+                    for (const [userId, messages] of Object.entries(usersMessages)) {
+                        const user = messages[0].from;
+                        const userHeader = document.createElement('h2');
+                        userHeader.textContent = `${user.first_name} ${user.last_name || ''} (@${user.username || 'нет_username'})`;
+                        messagesContainer.appendChild(userHeader);
+                        
+                        for (const message of messages) {
+                            await displayMessage(message, botToken);
+                        }
+                    }
+                    
+                } catch (error) {
+                    showError(`Ошибка при получении сообщений: ${error.message}`);
+                    console.error(error);
+                }
+            });
+            
+            clearMessagesBtn.addEventListener('click', function() {
+                messagesContainer.innerHTML = '';
+                botTokenInput.value = '';
+                localStorage.removeItem('telegramBotToken');
+            });
+            
+            async function getAllUpdates(botToken) {
+                let updates = [];
+                let offset = 0;
+                let hasMore = true;
+                
+                while (hasMore) {
+                    const response = await fetch(`https://api.telegram.org/bot${botToken}/getUpdates?offset=${offset}`);
+                    const data = await response.json();
+                    
+                    if (!data.ok || !data.result || data.result.length === 0) {
+                        hasMore = false;
+                        continue;
+                    }
+                    
+                    updates = updates.concat(data.result);
+                    offset = data.result[data.result.length - 1].update_id + 1;
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                }
+                
+                return updates;
+            }
+            
+            function groupMessagesByUser(updates) {
+                const usersMessages = {};
+                
+                for (const update of updates) {
+                    const message = update.message || update.edited_message;
+                    if (!message || !message.from) continue;
+                    
+                    const userId = message.from.id;
+                    if (!usersMessages[userId]) {
+                        usersMessages[userId] = [];
+                    }
+                    
+                    usersMessages[userId].push(message);
+                }
+                
+                return usersMessages;
+            }
+            
+            async function displayMessage(message, botToken) {
+                const messageDate = new Date(message.date * 1000);
+                const formattedDate = messageDate.toLocaleString();
+                
+                // Получаем аватар пользователя
+                let photoUrl = '';
+                try {
+                    const photosResponse = await fetch(`https://api.telegram.org/bot${botToken}/getUserProfilePhotos?user_id=${message.from.id}`);
+                    const photosData = await photosResponse.json();
+                    
+                    if (photosData.ok && photosData.result.photos && photosData.result.photos.length > 0) {
+                        const fileId = photosData.result.photos[0][0].file_id;
+                        const fileResponse = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`);
+                        const fileData = await fileResponse.json();
+                        
+                        if (fileData.ok) {
+                            photoUrl = `https://api.telegram.org/file/bot${botToken}/${fileData.result.file_path}`;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Ошибка при получении фото профиля:', e);
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message-container';
+                
+                let messageContent = '';
+                
+                // Обработка текстового сообщения
+                if (message.text) {
+                    messageContent += `<div class="message-text">${message.text}</div>`;
+                }
+                
+                // Обработка фото
+                if (message.photo) {
+                    // Берем последнее (самое большое) фото из массива
+                    const photo = message.photo[message.photo.length - 1];
+                    try {
+                        const fileResponse = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${photo.file_id}`);
+                        const fileData = await fileResponse.json();
+                        
+                        if (fileData.ok) {
+                            const imageUrl = `https://api.telegram.org/file/bot${botToken}/${fileData.result.file_path}`;
+                            messageContent += `<img src="${imageUrl}" class="message-image" alt="Фото">`;
+                            if (message.caption) {
+                                messageContent += `<div class="caption">${message.caption}</div>`;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Ошибка при получении фото:', e);
+                        messageContent += '<div class="message-text">[Не удалось загрузить изображение]</div>';
+                    }
+                }
+                
+                // Обработка документов (например, других изображений)
+                if (message.document && message.document.mime_type && message.document.mime_type.startsWith('image/')) {
+                    try {
+                        const fileResponse = await fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${message.document.file_id}`);
+                        const fileData = await fileResponse.json();
+                        
+                        if (fileData.ok) {
+                            const imageUrl = `https://api.telegram.org/file/bot${botToken}/${fileData.result.file_path}`;
+                            messageContent += `<img src="${imageUrl}" class="message-image" alt="Изображение">`;
+                            if (message.caption) {
+                                messageContent += `<div class="caption">${message.caption}</div>`;
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Ошибка при получении документа:', e);
+                        messageContent += '<div class="message-text">[Не удалось загрузить изображение]</div>';
+                    }
+                }
+                
+                // Если нет ни текста, ни изображений
+                if (!message.text && !message.photo && !(message.document && message.document.mime_type && message.document.mime_type.startsWith('image/'))) {
+                    messageContent += '<div class="message-text">(сообщение без текста)</div>';
+                }
+                
+                messageDiv.innerHTML = `
+                    <div class="user-info">
+                        ${photoUrl ? `<img src="${photoUrl}" class="user-avatar" alt="Фото профиля">` : ''}
+                        <div>
+                            <strong>${message.from.first_name} ${message.from.last_name || ''}</strong>
+                            <div>@${message.from.username || 'нет_username'}</div>
+                        </div>
+                    </div>
+                    ${messageContent}
+                    <div class="timestamp">${formattedDate}</div>
+                `;
+                
+                messagesContainer.appendChild(messageDiv);
+            }
+            
+            function showError(message) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error';
+                errorDiv.textContent = message;
+                messagesContainer.innerHTML = '';
+                messagesContainer.appendChild(errorDiv);
+            }
+        });
+    </script>
+</body>
+</html>
